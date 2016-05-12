@@ -72,4 +72,19 @@ class ExCh03Test extends FunSpec with Matchers {
       List.setHead(charList, 'z') should equal (List[Char]('z', 'b', 'c'))
     }
   }
+
+  describe("init method on List") {
+    it("Should return empty list on init empty list") {
+      List.init(emptyList) should equal (Nil)
+    }
+    it("Should return empty list on init single element list") {
+      List.init(List[Int](1)) should equal (Nil)
+    }
+    it("Should return original list except the last element on integer list") {
+      List.init(intList) should equal (List[Int](1, 2))
+    }
+    it("Should return original list except the last element on char list") {
+      List.init(charList) should equal (List[Char]('a', 'b'))
+    }
+  }
 }

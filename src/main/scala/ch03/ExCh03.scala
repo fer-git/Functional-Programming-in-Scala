@@ -62,7 +62,7 @@ object List {
   }
 
   /**
-    * Replace the first element of a List with different value
+    * Ex05, Replace the first element of a List with different value
     * @param lst List operated on
     * @param x Replacement on the first element
     * @return The list with first element replaced with parameter x
@@ -70,5 +70,16 @@ object List {
   def setHead[A](lst: List[A], x: A): List[A] = lst match {
     case Nil => Nil
     case Cons(h, t) => Cons(x, t)
+  }
+
+  /**
+    * Ex06, return a List consisting of all but the last element of a list
+    * @param lst List operated on
+    * @return The same as original list except the last element
+    */
+  def init[A](lst: List[A]): List[A] = lst match {
+    case Nil => Nil
+    case Cons(x, Nil) => Nil
+    case Cons(x, xs) => Cons(x, init(xs))
   }
 }
