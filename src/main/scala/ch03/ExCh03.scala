@@ -120,13 +120,48 @@ object List {
   def product3(l: List[Double]): Double = foldLeft(l, 1.0)(_ * _)
   def length2[A](l: List[A]): Int = foldLeft(l, 0)((z: Int, x: A) => z + 1)
 
-  def reverse[A](l: List[A]): List[A] = ???
+  /**
+    * Ex12 Function that return the reverse of a list with fold
+    * @param l List operated on
+    * @return List with reversed element
+    */
+  def reverse[A](l: List[A]): List[A] =
+    foldLeft(l, Nil: List[A])((z: List[A], x: A) => Cons(x, z))
 
-  def foldLeft2[A, B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  /**
+    * Ex13 Define foldLeft in terms of foldRight
+    * @param l List operated on
+    * @param z Accumulator
+    * @param f Function that accepts two parameters, current accumulator and
+    *          an element of the l
+    * @return Reduced operation on l with initial accumulator z and function f
+    */
+  def foldLeft2[A, B](l: List[A], z: B)(f: (B, A) => B): B =
+    foldRight(reverse(l), z)((x: A, acc: B) => f(acc, x))
 
-  def appendFL[A](l: List[A], xs: List[A]): List[A] = ???
+  /**
+    * Ex14, Append two lists into a list via foldLeft
+    * @param l First list
+    * @param xs Second list
+    * @return List with elements from l and xs
+    */
+  def appendFL[A](l: List[A], xs: List[A]): List[A] =
+    foldLeft(reverse(l), xs)((acc: List[A], x: A) => Cons(x, acc))
 
-  def appendFR[A](l: List[A], xs: List[A]): List[A] = ???
+  /**
+    * Ex14, Append two list into a list via foldRight
+    * @param l First list
+    * @param xs Second list
+    * @return List with elements from l and xs
+    */
+  def appendFR[A](l: List[A], xs: List[A]): List[A] =
+    foldRight(l, xs)(Cons(_, _))
 
-  def flatMap[A](ll: List[List[A]]): List[A] = ???
+  /**
+    * Ex15, Concatenates a list of lists into a single list
+    * @param ll List of list operated on
+    * @return A list with elements from all list of list
+    */
+  def flatMap[A](ll: List[List[A]]): List[A] =
+    foldLeft(ll, Nil: List[A])((acc: List[A], xs: List[A]) => appendFL(acc, xs))
 }
