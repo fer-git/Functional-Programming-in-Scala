@@ -9,6 +9,10 @@ class ExCh03Test extends FunSpec with Matchers {
   val emptyList = Nil
   val intList = List[Int](1, 2, 3)
   val charList = List[Char]('a', 'b', 'c')
+  val doubleList = List[Double](1.0, 2.0, 3.0)
+  def alwaysTrue[A](x: A): Boolean = true
+  def alwaysFalse[A](x: A): Boolean = false
+  def isOdd(x: Int): Boolean = (x % 2) == 1
 
   describe("tail method on List") {
     it("Should return Nil for empty list") {
@@ -40,10 +44,6 @@ class ExCh03Test extends FunSpec with Matchers {
       List.drop(charList, 2) should equal (List[Char]('c'))
     }
   }
-
-  def alwaysTrue[A](x: A): Boolean = true
-  def alwaysFalse[A](x: A): Boolean = false
-  def isOdd(x: Int): Boolean = (x % 2) == 1
 
   describe("dropWhile method on List") {
     it("Should return empty list for dropWhile on empty list") {
@@ -113,7 +113,6 @@ class ExCh03Test extends FunSpec with Matchers {
     }
   }
 
-  val doubleList = List[Double](1.0, 2.0, 3.0)
   describe("foldLeft version of sum, product, and length on List") {
     it("sum3 should return the same result as its foldRight version, sum2") {
       List.sum3(intList) should equal (List.sum2(intList))
@@ -191,8 +190,110 @@ class ExCh03Test extends FunSpec with Matchers {
         1, 2, 3))
     }
     it("should concatenated a list of two char lists into a char list") {
-      List.flatMap((List(charList, charList))) should equal (List[Char]('a',
+      List.flatMap(List(charList, charList)) should equal (List[Char]('a',
         'b', 'c', 'a', 'b', 'c'))
+    }
+  }
+
+  describe("add1 method on List") {
+    it("should return empty list for add1 on empty list") {
+      List.add1(Nil) should equal (Nil)
+    }
+    it("should return list of integer with each element incremented by 1") {
+      List.add1(intList) should equal (List[Int](2, 3, 4))
+    }
+  }
+
+  describe("doubleToString method in List") {
+    it("should return empty list for doubleToString on empty list") {
+      List.doubleToString(Nil) should equal (Nil)
+    }
+    it("should return list of String where each element is the same as " +
+      "element in original list but in string type") {
+      List.doubleToString(doubleList) should equal (List[String]("1.0", "2" +
+        ".0", "3.0"))
+    }
+  }
+
+  describe("map method in List") {
+    it("should return empty list for map on empty list") {
+      List.map(Nil)((x: Any) => x) should equal (Nil)
+    }
+    it("should return integer list with each element incremented by 1") {
+      List.map(intList)(_ + 1) should equal (List[Int](2, 3, 4))
+    }
+    it("should return string list with each element appended by 's'") {
+      List.map(charList)(_ + "s") should equal (List[String]("as", "bs", "cs"))
+    }
+  }
+
+  describe("filter method in List") {
+    it("should return empty list for filter on empty list") {
+      List.filter(Nil)((x: Any) => true) should equal (Nil)
+    }
+    it("should return integer list only with elements which get true " +
+      "predicate") {
+      List.filter(intList)(isOdd) should equal (List[Int](1, 3))
+    }
+  }
+
+  describe("flatMap1 method in List") {
+    it("should return empty list for flatMap1 on empty list") {
+      List.flatMap1(Nil)((x: Any) => List(x)) should equal (Nil)
+    }
+    it("should return integer list with each element incremented by 1") {
+      List.flatMap1(intList)((x: Int) => List(x+1)) should equal (List(2, 3, 4))
+    }
+  }
+
+  describe("filterViaflatMap1 method in List") {
+    it("should return empty list for filter on empty list") {
+      List.filterViaflatMap1(Nil)((x: Any) => true) should equal (Nil)
+    }
+    it("should return integer list only with elements which get true " +
+      "predicate") {
+      List.filterViaflatMap1(intList)(isOdd) should equal (List[Int](1, 3))
+    }
+  }
+
+  describe("addList method in List") {
+    it("should return empty list for adding empty list with integer list") {
+      List.addList(Nil, intList) should equal (Nil)
+      List.addList(intList, Nil) should equal (Nil)
+    }
+    it("should do element-wise addition given two integer lists") {
+      List.addList(intList, intList) should equal (List[Int](2, 4, 6))
+    }
+  }
+
+  describe("zipWith method in List") {
+    it("should return empty list for zipping with empty list") {
+      List.zipWith(intList, Nil)(_ + _) should equal(Nil)
+    }
+    it("should do element-wise addition with operator + on integer list") {
+      List.zipWith(intList, intList)(_ + _) should equal(List[Int](2, 4, 6))
+    }
+    it("should do element-wise concatination with on char list") {
+      List.zipWith(charList, charList)(_.toString + _.toString) should
+        equal (List[String]("aa", "bb", "cc"))
+    }
+  }
+
+  describe("hasSubsequence method in List") {
+    it("should return true for an empty list to be subsequence of other " +
+      "list") {
+      List.hasSubsequence(intList, Nil: List[Int]) should equal(true)
+    }
+    it("should return false for a list with different order to be " +
+      "subsequence of other list") {
+      List.hasSubsequence(intList, List[Int](3, 2, 1)) should equal(false)
+    }
+    it("should return true for a list to be subsequence of the list itself") {
+      List.hasSubsequence(intList, intList) should equal(true)
+    }
+    it("should return true for a list with fewer members but with correct " +
+      "order to be subsequence of other list") {
+      List.hasSubsequence(intList, List[Int](1, 2)) should equal(true)
     }
   }
 }

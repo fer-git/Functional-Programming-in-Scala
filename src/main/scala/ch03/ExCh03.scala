@@ -164,4 +164,144 @@ object List {
     */
   def flatMap[A](ll: List[List[A]]): List[A] =
     foldLeft(ll, Nil: List[A])((acc: List[A], xs: List[A]) => appendFL(acc, xs))
+
+  /**
+    * Ex16, Transform a list of integers by adding 1 to each element
+    * @param l List operated on
+    * @return Integer list with each element incremented by 1
+    */
+  def add1(l: List[Int]): List[Int] = l match {
+    case Nil => Nil
+    case Cons(x, xs) => Cons(x+1, add1(xs))
+  }
+
+  /**
+    * Ex17, Turn each value in List[Double] into String
+    * @param l List operated on
+    * @return List with elements casted into string
+    */
+  def doubleToString(l: List[Double]): List[String] = l match {
+    case Nil => Nil
+    case Cons(x, xs) => Cons(x.toString, doubleToString(xs))
+  }
+
+  /**
+    * Ex18, Modify each element of list with a function f
+    * @param l List operated on
+    * @param f Function that accepts a parameter, to be applied on each
+    *          list's element
+    * @return List with each element applied with function f
+    */
+  def map[A, B](l: List[A])(f: A => B): List[B] = l match {
+    case Nil => Nil
+    case Cons(x, xs) => Cons(f(x), map(xs)(f))
+  }
+
+  /**
+    * Ex19, Remove element from a list unless they satisfy a given predicate
+    * @param l List operated on
+    * @param f Predicate function for each element in the list
+    * @return list with filtered element by predicate f
+    */
+  def filter[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Nil => Nil
+    case Cons(x, xs) if f(x) => Cons(x, filter(xs)(f))
+    case Cons(x, xs) if !f(x) => filter(xs)(f)
+  }
+
+  /**
+    * Ex20, Higher order function works like map except the function given
+    * will return a list instead of a single result, the list should be
+    * inserted into the final resulting list
+    * @param l List operated on
+    * @param f Function that accepts one parameter, to be applied on each
+    *          list's element, returns a list
+    * @return Return a list of list consists of each element applied by f
+    */
+  def flatMap1[A, B](l: List[A])(f: A => List[B]): List[B] = l match {
+    case Nil => Nil
+    case Cons(x, xs) => appendFL(f(x), flatMap1(xs)(f))
+  }
+
+  /**
+    * Concatenate list of list into a single list
+    * @param ll List of list operated on
+    * @return List consists of each elements on each original list
+    */
+  def concat[A](ll: List[List[A]]): List[A] = foldRight(ll, Nil: List[A])(appendFL)
+
+  /**
+    * Alternative implementation of flatMap1 with foldRight
+    * @param l List operated on
+    * @param f Function that accepts one parameter, to be applied on each
+    *          list's element, returns a list
+    * @return Return a list of list consists of each element applied by f
+    */
+  def flatMap2[A, B](l: List[A])(f: A => List[B]): List[B] = concat(map(l)(f))
+
+  /**
+    * Ex21, filter implementation via flatMap
+    * @param l List operated on
+    * @param f Predicate function for each element in the list
+    * @return list with filtered element by predicate f
+    */
+  def filterViaflatMap1[A](l: List[A])(f: A => Boolean): List[A] =
+  flatMap1(l)((x: A) => if (f(x)) List(x) else Nil)
+
+  /**
+    * Ex22, Function that accepts two integer lists that adds them element-wise
+    * @param l First list
+    * @param xs Second list
+    * @return List where is element is by adding corresponding elements from
+    *         the two input lists
+    */
+  def addList(l: List[Int], xs: List[Int]): List[Int] = (l, xs) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h, t), Cons(y, ys)) => Cons(h + y, addList(t, ys))
+  }
+
+  /**
+    * Ex23, Generalization of addList, accept a function to be applied on
+    * each element pair from two input list
+    * @param l First list
+    * @param xs Second list
+    * @param f Function that accepts two parameters, first parameter is for
+    *          element in first list, and second parameter is for element in
+    *          second list
+    * @return List that consists of application of corresponding elements
+    *         from each input list
+    */
+  def zipWith[A, B, C](l: List[A], xs: List[B])(f: (A, B) => C): List[C] =
+    (l, xs) match {
+      case (Nil, _) => Nil
+      case (_, Nil) => Nil
+      case (Cons(h, t), Cons(y, ys)) => Cons(f(h, y), zipWith(t, ys)(f))
+    }
+
+  /**
+    * Ex24, Check whether a List contains another List as subsequence
+    * @param l List operated on
+    * @param sub List in which we check whether it is subsequence of l or not
+    * @return True is sub is subsequence of l, false otherwise
+    */
+  def hasSubsequence[A](l: List[A], sub: List[A]): Boolean = l match {
+    case Nil => sub == Nil
+    case _ if startsWith(l, sub) => true
+    case Cons(x, xs) => hasSubsequence(xs, sub)
+  }
+
+  /**
+    * Check if the second list shares the same starting elements with the first
+    * list
+    * @param l First list
+    * @param xs Second list
+    * @return True if xs shares the same starting elements with l, false
+    *         otherwise
+    */
+  def startsWith[A](l: List[A], xs: List[A]): Boolean = (l, xs) match {
+    case (_, Nil) => true
+    case (Cons(h, t), Cons(y, ys)) if h == y => startsWith(t, ys)
+    case _ => false
+  }
 }
