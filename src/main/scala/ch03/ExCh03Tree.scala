@@ -54,13 +54,18 @@ object Tree {
   Ex29, generalize size, maximum, depth, and map writing a new function fold
   that abstracts over their similarities.
    */
-  def fold[A, B](t: Tree[A])(f: A => B)(g:(B, B) => B): B = ???
+  def fold[A, B](t: Tree[A])(f: A => B)(g:(B, B) => B): B = t match {
+    case Leaf(a) => f(a)
+    case Branch(t1, t2) => g(fold(t1)(f)(g), fold(t2)(f)(g))
+  }
 
-  def sizeViaFold[A](t: Tree[A]): Int = ???
+  def sizeViaFold[A](t: Tree[A]): Int = fold(t)(_ => 1)(1 + _ + _)
 
-  def maximumViaFold(t: Tree[Int]): Int = ???
+  def maximumViaFold(t: Tree[Int]): Int = fold(t)(x => x)(_ max _)
 
-  def depthViaFold[A](t: Tree[A]): Int = ???
+  def depthViaFold[A](t: Tree[A]): Int = fold(t)(_ => 0)((d1, d2) => 1 + d1
+    max d2)
 
-  def mapViaFold[A, B](t: Tree[A])(f: A => B): Tree[B] = ???
+  def mapViaFold[A, B](t: Tree[A])(f: A => B): Tree[B] =
+    fold(t)(a => Leaf(f(a)): Tree[B])(Branch(_, _))
 }
