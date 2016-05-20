@@ -86,4 +86,15 @@ object ExCh04 {
   def sequence[A](a: List[Option[A]]): Option[List[A]] = {
     a.foldRight[Option[List[A]]](Some(Nil))((x, y) => map2(x, y)(_ :: _))
   }
+
+  /**
+    * Ex06, Combination of map and sequence, but with only looks at the list
+    * once.
+    * @param a List operated on
+    * @param f Function to be applied on each element
+    * @return Option of List which f has been applied on each element on
+    *         original list
+    */
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
+  a.foldRight[Option[List[B]]](Some(Nil))((x, y) => map2(f(x), y)(_ :: _))
 }

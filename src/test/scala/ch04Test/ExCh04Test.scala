@@ -55,4 +55,17 @@ class ExCh04Test extends FunSpec with Matchers {
       sequence(List(Some(1), None, Some(3))) should equal (None)
     }
   }
+
+  describe("traverse") {
+    it("should return Some(Nil) for empty list") {
+      traverse(Nil)((x: Int) => Some(x)) should equal (Some(Nil))
+    }
+    it("should return None if at least one of the element produced None by f") {
+      traverse(List(1, 2))((x: Int) => None) should equal (None)
+    }
+    it("should return Some of List if none of the element produced None by f") {
+      traverse(List(1, 2))((x: Int) => Some(x + 1)) should equal (Some(List
+      (2, 3)))
+    }
+  }
 }
