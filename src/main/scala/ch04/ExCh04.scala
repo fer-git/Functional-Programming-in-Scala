@@ -97,4 +97,25 @@ object ExCh04 {
     */
   def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] =
   a.foldRight[Option[List[B]]](Some(Nil))((x, y) => map2(f(x), y)(_ :: _))
+
+  /**
+    * Ex08, implement traverse for Either
+    * @param es List operated on
+    * @param f Function to be applied on each element on es
+    * @return Return Left if at least application f on element of es results
+    *         in Left, else Right with each element applied by f
+    */
+  def traverseEither[E, A, B](es: List[A])(f: A => Either[E, B]): Either[E,
+    List[B]] = es.foldRight[Either[E, List[B]]](Right(Nil))((a, b) => f(a)
+    .map2(b)(_ :: _))
+
+  /**
+    * Ex08, implement sequence for Either
+    * @param es List operated on
+    * @return Return Left if at least one of the element in es is Left, else
+    *         return a List with the content of each Right of es
+    */
+  def sequenceEither[E, A](es: List[Either[E, A]]): Either[E, List[A]] = {
+    traverseEither(es)(x => x)
+  }
 }

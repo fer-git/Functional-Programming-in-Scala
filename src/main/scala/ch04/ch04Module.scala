@@ -60,6 +60,20 @@ object ch04Module {
     mkMatcher(pat) flatMap(f => mkMatcher(pat2) map (g => f(s) && g(s)))
   }
 
+  def meanEither(xs: IndexedSeq[Double]):Either[String, Double] = {
+    if (xs.isEmpty) Left("mean of empty list!")
+    else Right(xs.sum / xs.length)
+  }
+
+  def safeDiv(x: Double, y: Double): Either[Exception, Double] = {
+    try{
+      Right(x/y)
+    } catch {
+      case e: Exception => Left(e)
+    }
+  }
+
+
   def main(args: Array[String]) {
     println(mean(List(1, 2, 3)))
     println(mean_2(List()))

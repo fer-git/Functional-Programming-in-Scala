@@ -3,6 +3,7 @@ package ch04Test
 import org.scalatest.{Matchers, FunSpec}
 import ch04.ExCh04._
 import ch04.{None, Some}
+import ch04.{Left, Right}
 
 /**
   * Created by fernandopratama on 18/5/16.
@@ -66,6 +67,34 @@ class ExCh04Test extends FunSpec with Matchers {
     it("should return Some of List if none of the element produced None by f") {
       traverse(List(1, 2))((x: Int) => Some(x + 1)) should equal (Some(List
       (2, 3)))
+    }
+  }
+
+  describe("traverseEither") {
+    it("should return Right Nil for empty list") {
+      traverseEither(Nil)(x => Left(x)) should equal (Right(Nil))
+    }
+    it("should return Left if at least one of the element returns Left") {
+      traverseEither(List(10, 1, 2))(x => Left(x)) should
+        equal (Left(10))
+    }
+    it("should return Right if none of the element returns Left") {
+      traverseEither(List(1, 2, 3))((x: Int) => Right(x+1)) should
+        equal (Right(List(2, 3, 4)))
+    }
+  }
+
+  describe("sequenceEither") {
+    it ("should return Right Nil for empty list") {
+      sequenceEither(Nil) should equal (Right(Nil))
+    }
+    it("should return Left if at least of the element is Left") {
+      sequenceEither(List(Right(10), Left("Error"), Right(1))) should
+      equal (Left("Error"))
+    }
+    it("should return Right if all elements are Right") {
+      sequenceEither(List(Right(1), Right(2), Right(3))) should
+      equal (Right(List(1, 2, 3)))
     }
   }
 }
