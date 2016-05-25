@@ -223,4 +223,44 @@ class StreamTest extends FunSpec with Matchers {
     }
   }
 
+  describe("startsWith method in Stream") {
+    it("should return true if the other Stream starts with the same element") {
+      Stream(1, 2, 3).startsWith(Stream(1, 2)) should equal (true)
+    }
+    it("should return false if the other Stream starts with different " +
+      "element") {
+      Stream(1, 2, 3).startsWith(Stream(4, 5)) should equal (false)
+    }
+  }
+
+  describe("tails method in Stream") {
+    it("should return List of Empty for Empty Stream") {
+      Empty.tails.toList should equal (List(Empty))
+    }
+    it("should return Stream of suffixes for Cons Stream") {
+      Stream(1, 2).tails.toList.map(_.toList) should equal (List(List(1, 2),
+        List(2), List()))
+    }
+  }
+
+  describe("hasSubsequence in Stream") {
+    it("should return true if the other is Empty Stream") {
+      Stream(1, 2).hasSubsequence(Empty) should equal (true)
+    }
+    it("should return true if the other has some elements from the Stream " +
+      "with the correct order") {
+      Stream(1, 2, 3).hasSubsequence(Stream(2, 3)) should equal (true)
+    }
+    it("should return false if the other has the wrong order") {
+      Stream(1, 2, 3).hasSubsequence(Stream(3, 1, 2)) should equal (false)
+    }
+  }
+
+  describe("scanRight in Stream") {
+    it("should return the sum for each tail in Int Stream") {
+      Stream(1, 2, 3).scanRight(0)(_+_).toList should
+        equal (List(6, 5, 3, 0))
+    }
+  }
+
 }

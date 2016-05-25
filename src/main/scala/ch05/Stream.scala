@@ -137,6 +137,55 @@ sealed trait Stream[+A] {
 
   def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] = zipWithAll(s2)(
     (_, _))
+
+  /**
+    * Ex13, Implement startsWith with the functions you've written
+    * @param s2 Stream we want to check with
+    * @return true if s2 has the same starting elements, else false
+    */
+  def startsWith[A](s2: Stream[A]): Boolean = {
+    zipAll(s2).takeWhile(!_._2.isEmpty) forAll {
+      case(h, h2) => h == h2
+    }
+  }
+
+  @annotation.tailrec
+  final def drop(n: Int): Stream[A] = this match {
+    case Cons(_, t) if n > 0 => t().drop(n-1)
+    case _ => this
+  }
+  /**
+    * Implement tail using unfold
+    * @return Stream of suffixes of input sequence, starting with original
+    *         Stream
+    */
+  def tails: Stream[Stream[A]] = {
+    unfold(this) {
+      case Empty => None
+      case s => Some((s, s drop 1))
+    } append Stream(empty)
+  }
+
+  /**
+    * Check if s2 is the subsequence of the Stream
+    * @param s2 Stream which we suspect to be the subsequence of this Stream
+    * @return true if s2 is the subsequence of this Stream, else false
+    */
+  def hasSubsequence[A](s2: Stream[A]): Boolean = tails exists(_ startsWith s2)
+
+  /**
+    * Ex15, generalization of tails
+    * @param z Initial value
+    * @param f Function to be applied
+    * @return
+    */
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = {
+    foldRight((z, Stream(z)))((a, p0) => {
+      lazy val p1 = p0
+      val b2 = f(a, p1._1)
+      (b2, cons(b2, p1._2))
+    })._2
+  }
 }
 
 case object Empty extends Stream[Nothing]
