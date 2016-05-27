@@ -137,6 +137,7 @@ object RNG {
 
   /**
     * Ex09, Implement flatMap, then use it to reimplement positive Int
+    *
     * @param f Rand operated on
     * @param g Function that takes element in f and apply it to return Rand
     * @return Rand from the result of applying g to element in f
@@ -164,6 +165,7 @@ object RNG {
 
   /**
     * Ex05, generate an Int between 0 to n, inclusive
+    *
     * @param n maximum value of random Integer
     * @return Random Int ranging between 0 to n inclusive
     */
@@ -171,6 +173,43 @@ object RNG {
   flatMap(positiveInt) {i =>
   val mod = i % n
   if (i + (n - 1) - mod >= 0) unit(mod) else positiveMax(n)}
+}
+
+import State._
+
+case class State[S, +A](run: S => (A, S)) {
+  /*
+  Ex11, generalize functions unit, map, map2, flatMap, and sequence
+   */
+  def flatMap[B](f: A => State[S, B]): State[S, B] = {
+    State(s => {
+      val (a, s1) = run(s)
+      f(a).run(s1)
+    })
+  }
+
+  def map[B](f: A => B):State[S, B] = flatMap(a => unit(f(a)))
+
+  def map2[B, C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
+  flatMap(a => sb.map(b => f(a, b)))
+}
+
+object State {
+  type Rand[A] = State[RNG, A]
+
+  def unit[S, A](a: A): State[S, A] = State(s => (a, s))
+
+  def sequenceViaFoldRight[S, A](sas: List[State[S,A]]): State[S, List[A]] =
+    sas.foldRight(unit[S, List[A]](List()))((f, acc) => f.map2(acc)(_ :: _))
+
+  def sequence[S, A](sas: List[State[S, A]]): State[S, List[A]] = {
+    def go(s: S, actions: List[State[S, A]], acc: List[A]): (List[A], S) =
+    actions match {
+      case Nil => (acc.reverse, s)
+      case h :: t => h.run(s) match {case (a, s2) => go(s2, t, a :: acc)}
+    }
+    State((s: S) => go(s, sas, List()))
+  }
 }
 
 
