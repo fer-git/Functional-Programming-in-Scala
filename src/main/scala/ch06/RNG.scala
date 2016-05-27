@@ -210,7 +210,50 @@ object State {
     }
     State((s: S) => go(s, sas, List()))
   }
+
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
+
+  /*
+  Ex12, Come up with the signatures for get and set
+   */
+
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
 }
 
+/*
+Ex13, Implement a simulation of candy dispenser. The machine has two input:
+You can insert a coin, or you can turn the knob to dispense the candy. It can
+ be in one of  two states: locked or unlocked. it also tracks how many
+ candies are left and how many coins it contains.
+ */
+
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies: Int, coins: Int)
+
+object Candy {
+  def update = (i: Input) => (s: Machine) =>
+    (i, s) match {
+      case (_, Machine(_, 0, _)) => s
+      case (Coin, Machine(false, _, _)) => s
+      case (Turn, Machine(true, _, _)) => s
+      case (Coin, Machine(true, candy, coin)) =>
+        Machine(false, candy, coin+1)
+      case (Turn, Machine(false, candy, coin)) =>
+        Machine (true, candy - 1, coin)
+    }
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
+    _ <- sequence(inputs map (modify[Machine] _ compose update))
+    s <- get
+  } yield (s.coins, s.candies)
+}
 
 
